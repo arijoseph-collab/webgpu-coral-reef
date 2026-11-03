@@ -1,0 +1,5 @@
+{
+  "name": "Houdini 22.0 → WebGPU Photorealistic Coral Reef",
+  "description": "Real-time Three.js WebGPU + TSL tropical coral reef calibrated against Houdini FX 22.0 Solaris + Karma path-traced ground truth, featuring 3D vertex displacement, Steep POM, volumetric calice parallax, Random-Walk in-pore SSS, and interactive webgpu-water caustics.",
+  "requestFramePermissions": []
+}

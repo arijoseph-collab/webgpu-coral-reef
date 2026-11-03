@@ -1,0 +1,19 @@
+{
+  "name": "webgpu-coral-reef",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Photorealistic Houdini FX 22.0 Solaris/Karma → Three.js WebGPU + TSL Coral Reef Biome",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "start": "node server.js",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "three": "0.172.0"
+  },
+  "devDependencies": {
+    "vite": "^6.0.0"
+  }
+}

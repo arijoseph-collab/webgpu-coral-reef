@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" href="data:," />
+  <title>Houdini 22.0 → Three.js WebGPU Photorealistic Coral Reef</title>
+  <link rel="stylesheet" href="./style.css" />
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.172.0/build/three.webgpu.js",
+        "three/webgpu": "https://cdn.jsdelivr.net/npm/three@0.172.0/build/three.webgpu.js",
+        "three/tsl": "https://cdn.jsdelivr.net/npm/three@0.172.0/build/three.tsl.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.172.0/examples/jsm/"
+      }
+    }
+  </script>
+</head>
+<body>
+  <div id="loading-overlay">
+    <div class="spinner"></div>
+    <div id="loading-text" style="font-size:14px;font-weight:600;">Loading Houdini 22.0 Perforated Coral Reef GLB (59.7 MB) + 14-Ray Baked AO &amp; 2K Maps...</div>
+  </div>
+
+  <div id="canvas-container"></div>
+
+  <!-- Houdini FX 22.0 Solaris + Karma Path-Traced Benchmark Modal -->
+  <div id="checkpoint-modal" class="hidden">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div>
+          <span class="badge houdini">Houdini FX 22.0.466 · Solaris + Karma XPU + Intel OIDN</span>
+          <h2 style="font-size:16px;margin-top:4px;">Photorealistic Path-Traced Ground-Truth Benchmarks (`3.08M` Tris · MaterialX Random-Walk SSS · 3D Displaced Pores &amp; Sand Lab)</h2>
+        </div>
+        <button class="btn" id="btn-close-modal" style="padding:7px 14px;">Close (ESC)</button>
+      </div>
+      <div class="modal-grid">
+        <div class="modal-img-box">
+          <img src="./houdini_karma_hero.png?v=12" alt="Houdini Solaris Karma Hero Bouquet Benchmark" />
+          <div class="modal-caption">
+            <strong>Hero Bouquet (`1280×720` Karma XPU, `f/9.0`):</strong> `mtlxstandard_surface` Random-Walk SSS, wet-mucus clearcoat (`IOR 1.37`), 3D displaced Worley `f2 - f1` calice craters, and radial costae ribs.
+          </div>
+        </div>
+        <div class="modal-img-box">
+          <img src="./houdini_karma_wide.png?v=12" alt="Houdini Solaris Karma Wide Reef & Sand Lab Floor Benchmark" />
+          <div class="modal-caption">
+            <strong>Wide Reef &amp; Sand Lab Floor (`f/10.0`):</strong> `720×720` 3D displaced Swift–Hohenberg vortex ripples, ray-traced wave caustics, matte porous limestone boulders, rubble, sponges, &amp; reef life.
+          </div>
+        </div>
+        <div class="modal-img-box">
+          <img src="./houdini_karma_macro.png?v=12" alt="Houdini Solaris Karma Polyp & Pore Macro Benchmark" />
+          <div class="modal-caption">
+            <strong>Polyp &amp; Pore Macro (`f/3.6`, `focus = 1.33 m`):</strong> Physical thin-lens optical DOF with `~1.5 mm` 3D displaced honeycomb trabecular walls, deep calice craters, and growing-tip scatter.
+          </div>
+        </div>
+        <div class="modal-img-box">
+          <img src="./houdini_karma_tropical.png?v=12" alt="Houdini Solaris Karma Tropical Lagoon Benchmark" />
+          <div class="modal-caption">
+            <strong>Tropical Marine Lagoon (`karma_dome_tropical.hdr`):</strong> Clear Indo-Pacific turquoise water column, volumetric sun-ray shafts, and caustic filaments across 3D sand ripples.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="hud-header">
+    <div class="hud-title-row">
+      <span class="badge houdini">Houdini FX 22.0.466</span>
+      <span class="badge scan">TSL 3D Honeycomb Pores + 14-Ray AO</span>
+      <span class="badge" id="renderer-badge">WebGPU Initializing...</span>
+    </div>
+    <h1>Perforated Coral Reef — 3D Honeycomb Cavities &amp; Baked AO</h1>
+    <p class="hud-sub">
+      Sculpted in SideFX Houdini (`/obj/coral_reef/OUT_CORAL_REEF`) with 14-ray raytraced vertex AO (`_CORAL_DATA`), species cavity palettes (`_CAVITY_CD`), and real-time WebGPU TSL sub-pixel 3D Voronoi honeycomb pore shading.
+    </p>
+    <div class="stats-grid">
+      <div class="stat-box">
+        <span>Vertices</span>
+        <strong id="stat-verts">561,710</strong>
+      </div>
+      <div class="stat-box">
+        <span>Triangles</span>
+        <strong id="stat-tris">1,045,930</strong>
+      </div>
+      <div class="stat-box">
+        <span>PBR + TSL Pores</span>
+        <strong>2K + 3D Voronoi</strong>
+      </div>
+    </div>
+    <div class="cam-preset-bar">
+      <button class="btn active" id="cam-wide">Hero Bouquet View</button>
+      <button class="btn" id="cam-brain">Wide Reef &amp; Seabed</button>
+      <button class="btn" id="cam-sponge">Polyp &amp; Pore Macro</button>
+      <button class="btn" id="cam-up" title="Look up through Snell's window; click the water to make ripples">Look Up · Snell's Window</button>
+      <button class="btn houdini-btn" id="btn-open-modal">Houdini Karma Benchmarks</button>
+    </div>
+  </div>
+
+  <div class="hud-controls">
+    <div class="section-title">Lighting &amp; Reef Mood</div>
+    <div class="preset-row">
+      <button class="btn active" id="preset-day">Pastel Reference</button>
+      <button class="btn" id="preset-sunset">Tropical Marine</button>
+      <button class="btn" id="preset-night">Bio-Night</button>
+    </div>
+
+    <div class="section-title">3D Honeycomb Pores &amp; Ambient Occlusion</div>
+
+    <div class="control-group">
+      <div class="control-label">
+        <span>3D Honeycomb Pore Depth (`poreStrength`)</span>
+        <span class="val" id="val-normal">1.15</span>
+      </div>
+      <input type="range" id="slider-normal" min="0" max="2.0" step="0.05" value="1.15" />
+    </div>
+
+    <div class="control-group">
+      <div class="control-label">
+        <span>3D Bump &amp; Displacement (`bumpStrength`)</span>
+        <span class="val" id="val-disp">1.25</span>
+      </div>
+      <input type="range" id="slider-disp" min="0" max="2.4" step="0.05" value="1.25" />
+    </div>
+
+    <div class="control-group">
+      <div class="control-label">
+        <span>14-Ray Baked + Cavity AO (`aoIntensity`)</span>
+        <span class="val" id="val-ao">1.20</span>
+      </div>
+      <input type="range" id="slider-ao" min="0" max="2.0" step="0.05" value="1.20" />
+    </div>
+
+    <div class="control-group">
+      <div class="control-label">
+        <span>Volumetric Sun Shafts &amp; Water (`waterAtmosphere`)</span>
+        <span class="val" id="val-bump">1.05</span>
+      </div>
+      <input type="range" id="slider-bump" min="0" max="2.0" step="0.05" value="1.05" />
+    </div>
+
+    <div class="control-group">
+      <div class="control-label">
+        <span>Subsurface &amp; Tip Glow (`sssIntensity`)</span>
+        <span class="val" id="val-emissive">0.28</span>
+      </div>
+      <input type="range" id="slider-emissive" min="0" max="1.2" step="0.02" value="0.28" />
+    </div>
+
+    <div class="control-group">
+      <div class="control-label">
+        <span>Wet Mucus &amp; Roughness Scale</span>
+        <span class="val" id="val-rough">0.84</span>
+      </div>
+      <input type="range" id="slider-rough" min="0.1" max="1.2" step="0.02" value="0.84" />
+    </div>
+
+    <div class="control-group">
+      <div class="control-label">
+        <span>Refracted Water Caustics (`causticsScale`)</span>
+        <span class="val" id="val-caustics">1.15</span>
+      </div>
+      <input type="range" id="slider-caustics" min="0" max="2.2" step="0.05" value="1.15" />
+    </div>
+
+    <div class="section-title" style="margin-top: 4px;">Performance</div>
+    <div class="perf-grid">
+      <div class="stat-box">
+        <span>FPS</span>
+        <strong id="perf-fps">--</strong>
+      </div>
+      <div class="stat-box">
+        <span title="Submit to GPU completion (includes queueing and power state)">GPU latency</span>
+        <strong id="perf-gpu">--</strong>
+      </div>
+      <div class="stat-box">
+        <span>Render scale</span>
+        <strong id="perf-scale">--</strong>
+      </div>
+    </div>
+    <div class="preset-row" style="grid-template-columns: 1fr; margin-top: 8px; margin-bottom: 4px;">
+      <button class="btn active" id="btn-adaptive" title="Scale the internal render resolution to hold 60 fps">Adaptive Res: ON</button>
+    </div>
+
+    <div class="preset-row" style="grid-template-columns: 1fr 1fr; margin-top: 8px;">
+      <button class="btn" id="btn-wireframe">Toggle Wireframe</button>
+      <button class="btn active" id="btn-autorotate">Auto-Orbit: ON</button>
+    </div>
+    <div class="preset-row" style="grid-template-columns: 1fr; margin-top: 8px;">
+      <button class="btn" id="btn-rain" title="Raindrops excite the webgpu-water heightfield simulation: rings ripple through the caustics and the surface">Rain on the Surface: OFF</button>
+    </div>
+
+    <div class="tex-inspector">
+      <div class="section-title">2K Perforated Coral PBR Maps</div>
+      <div class="species-tabs" id="species-tabs">
+        <div class="species-tab active" data-species="staghorn">Staghorn</div>
+        <div class="species-tab" data-species="brain">Brain Coral</div>
+        <div class="species-tab" data-species="table">Foliose Fan</div>
+        <div class="species-tab" data-species="sponge">Acropora</div>
+        <div class="species-tab" data-species="seabed">Seabed</div>
+      </div>
+      <div class="swatch-grid">
+        <div class="swatch">
+          <img id="sw-albedo" src="./textures/staghorn_albedo.png?v=10" alt="Albedo" />
+          Albedo
+        </div>
+        <div class="swatch">
+          <img id="sw-bump" src="./textures/staghorn_bump.png?v=10" alt="Disp/Bump" />
+          3D Height
+        </div>
+        <div class="swatch">
+          <img id="sw-normal" src="./textures/staghorn_normal.png?v=10" alt="Normal" />
+          Normal GL
+        </div>
+        <div class="swatch">
+          <img id="sw-rough" src="./textures/staghorn_roughness.png?v=10" alt="Roughness" />
+          Roughness
+        </div>
+        <div class="swatch">
+          <img id="sw-emissive" src="./textures/staghorn_emissive.png?v=10" alt="Emissive" />
+          Bio-Glow
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener("error", (e) => {
+      const el = e.target;
+      if (el && el.tagName === "IMG" && !el.dataset.cdnFallback) {
+        el.dataset.cdnFallback = "1";
+        el.crossOrigin = "anonymous";
+        const p = (el.getAttribute("src") || "").replace(/^\.\//, "").replace(/^\//, "").split("?")[0];
+        if (p) el.src = "https://raw.githubusercontent.com/arijoseph-collab/webgpu-coral-reef/main/public/" + p;
+      }
+    }, true);
+  </script>
+  <script type="module" src="./app.js"></script>
+</body>
+</html>

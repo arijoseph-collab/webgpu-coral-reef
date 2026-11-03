@@ -1,0 +1,17 @@
+node_modules/
+dist/
+bench_results/
+serve.log
+.DS_Store
+__pycache__/
+*.pyc
+*.hipnc
+*.hip
+*.hiplc
+*.rat
+*.exr
+houdini/*.npz
+houdini/*.hdr
+houdini/*.png
+houdini/sand_lab_status.json
+public/textures/polyhaven/
