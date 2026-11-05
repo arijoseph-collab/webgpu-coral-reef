@@ -1635,13 +1635,13 @@ document.getElementById("btn-wireframe").addEventListener("click", (e) => {
 if (urlParams.get("rain") === "1") {
   ocean.rainRate = 70;
   document.getElementById("btn-rain").classList.add("active");
-  document.getElementById("btn-rain").textContent = "Rain on the Surface: ON";
+  document.getElementById("btn-rain").textContent = "Rain: ON";
 }
 document.getElementById("btn-rain").addEventListener("click", (e) => {
   const on = !(ocean.rainRate > 0);
   ocean.rainRate = on ? 70 : 0;
   e.target.classList.toggle("active", on);
-  e.target.textContent = on ? "Rain on the Surface: ON" : "Rain on the Surface: OFF";
+  e.target.textContent = on ? "Rain: ON" : "Rain: OFF";
 });
 
 document.getElementById("btn-autorotate").addEventListener("click", (e) => {

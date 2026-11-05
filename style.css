@@ -1,378 +1,636 @@
+/* ============================================================================
+   MINIMAL FLOATING-PILL INTERFACE (designskill.md)
+   Aesthetic DNA: Google Cloud Kiosk × Arrival Configurator × TE OP-1 Field
+   ============================================================================ */
 :root {
-  --bg-glass: rgba(6, 18, 32, 0.82);
-  --border-glass: rgba(45, 212, 191, 0.28);
+  --bg-pill: rgba(6, 18, 32, 0.78);
+  --bg-popover: rgba(6, 18, 32, 0.90);
+  --line-pill: rgba(255, 255, 255, 0.14);
+  --line-accent: rgba(45, 212, 191, 0.42);
   --accent: #2dd4bf;
   --accent-glow: #38bdf8;
   --accent-houdini: #fb923c;
-  --text-main: #f0fdfa;
-  --text-muted: #94a3b8;
+  --ink-primary: #f8fafc;
+  --ink-secondary: #cbd5e1;
+  --ink-muted: #94a3b8;
+  --shadow-float: 0 14px 36px rgba(0, 0, 0, 0.42), 0 2px 8px rgba(0, 0, 0, 0.24);
+  --radius-pill: 999px;
+  --radius-card: 26px;
+  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
 }
+
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
+
+html,
 body {
+  width: 100vw;
+  height: 100vh;
   overflow: hidden;
   background: #03111f;
-  font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, sans-serif;
-  color: var(--text-main);
+  font-family: var(--font-sans);
+  color: var(--ink-primary);
   user-select: none;
+  -webkit-font-smoothing: antialiased;
 }
+
+/* Full-Viewport 3D Stage */
 #canvas-container {
   position: fixed;
   inset: 0;
+  z-index: 1;
 }
-body.no-hud .hud-header,
-body.no-hud .hud-controls {
-  display: none !important;
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
 }
-/* Top Header Badge */
-.hud-header {
+
+/* ============================================================================
+   FLOATING PILLS (Top-Left & Top-Right Anchors)
+   ============================================================================ */
+.floating-pill {
   position: fixed;
-  top: 18px;
-  left: 18px;
-  z-index: 10;
-  background: var(--bg-glass);
-  backdrop-filter: blur(16px);
-  border: 1px solid var(--border-glass);
-  border-radius: 14px;
-  padding: 14px 18px;
-  max-width: 440px;
-  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.52);
-}
-.hud-title-row {
-  display: flex;
+  z-index: 20;
+  display: inline-flex;
   align-items: center;
   gap: 8px;
-  margin-bottom: 6px;
-  flex-wrap: wrap;
+  padding: 7px 10px;
+  background: var(--bg-pill);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1.5px solid var(--line-pill);
+  border-radius: var(--radius-pill);
+  box-shadow: var(--shadow-float);
+  transition: opacity 0.28s ease, transform 0.28s ease;
 }
-.badge {
-  font-size: 10px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  padding: 3px 8px;
-  border-radius: 999px;
-  background: rgba(45, 212, 191, 0.18);
-  color: var(--accent);
-  border: 1px solid rgba(45, 212, 191, 0.4);
+
+.top-left-pill {
+  top: 18px;
+  left: 18px;
+  padding-left: 14px;
+  max-width: calc(100vw - 36px);
 }
-.badge.houdini {
-  background: rgba(251, 146, 60, 0.18);
-  color: var(--accent-houdini);
-  border-color: rgba(251, 146, 60, 0.45);
+
+.top-right-pill {
+  top: 18px;
+  right: 18px;
 }
-.badge.scan {
-  background: rgba(56, 189, 248, 0.18);
-  color: var(--accent-glow);
-  border-color: rgba(56, 189, 248, 0.42);
-}
-h1 {
-  font-size: 16px;
-  font-weight: 700;
-  letter-spacing: -0.01em;
-}
-.hud-sub {
-  font-size: 11.5px;
-  color: var(--text-muted);
-  line-height: 1.45;
-  margin-top: 4px;
-}
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
+
+/* Brand Identity inside Top-Left Pill */
+.brand-badge {
+  display: inline-flex;
+  align-items: center;
   gap: 8px;
-  margin-top: 10px;
-  padding-top: 10px;
-  border-top: 1px solid rgba(255, 255, 255, 0.09);
-  font-size: 11px;
+  padding-right: 2px;
 }
-.stat-box span {
-  display: block;
-  color: var(--text-muted);
+
+.brand-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 0 3px rgba(45, 212, 191, 0.22);
+  flex-shrink: 0;
+}
+
+.brand-title {
+  font-weight: 800;
+  font-size: 12.5px;
+  letter-spacing: 0.04em;
+  color: var(--ink-primary);
+  white-space: nowrap;
+}
+
+.brand-sub {
+  font-family: var(--font-mono);
   font-size: 10px;
-}
-.stat-box strong {
+  font-weight: 600;
   color: var(--accent-glow);
-  font-size: 13px;
-  font-variant-numeric: tabular-nums;
+  background: rgba(56, 189, 248, 0.14);
+  border: 1px solid rgba(56, 189, 248, 0.32);
+  padding: 2px 7px;
+  border-radius: var(--radius-pill);
+  letter-spacing: 0.04em;
+  white-space: nowrap;
 }
-.cam-preset-bar {
+
+.pill-divider {
+  width: 1px;
+  height: 20px;
+  background: rgba(255, 255, 255, 0.14);
+  margin: 0 2px;
+  flex-shrink: 0;
+}
+
+.pill-btn-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Pill Action Chips */
+button.btn.icon-pill-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 12px;
+  border-radius: var(--radius-pill);
+  border: 1.5px solid transparent;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--ink-secondary);
+  font-family: var(--font-sans);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.16s ease;
+}
+
+button.btn.icon-pill-btn:hover {
+  background: rgba(255, 255, 255, 0.13);
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
+button.btn.icon-pill-btn.active {
+  background: rgba(45, 212, 191, 0.22);
+  border-color: var(--accent);
+  color: #ffffff;
+  box-shadow: 0 4px 14px rgba(45, 212, 191, 0.24);
+}
+
+button.btn.icon-pill-btn.houdini-btn {
+  background: rgba(251, 146, 60, 0.16);
+  border-color: rgba(251, 146, 60, 0.42);
+  color: #fed7aa;
+}
+
+button.btn.icon-pill-btn.houdini-btn:hover {
+  background: rgba(251, 146, 60, 0.30);
+  color: #ffffff;
+}
+
+/* Telemetry Readout inside Top-Right Pill */
+.telemetry-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 12px;
+  border-radius: var(--radius-pill);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--ink-secondary);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.telemetry-pill strong {
+  color: var(--accent-glow);
+  font-weight: 700;
+}
+
+.telemetry-sep {
+  color: rgba(255, 255, 255, 0.28);
+}
+
+.status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.22);
+  animation: pulseDot 2.2s infinite ease-in-out;
+}
+
+@keyframes pulseDot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.55; transform: scale(0.92); }
+}
+
+/* ============================================================================
+   ON-DEMAND POPOVER CARD (Toggled by 🎛️ TUNE Pill)
+   ============================================================================ */
+.popover-card {
+  position: fixed;
+  top: 72px;
+  right: 18px;
+  z-index: 25;
+  width: 356px;
+  max-height: calc(100vh - 92px);
+  overflow-y: auto;
+  background: var(--bg-popover);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1.5px solid var(--line-pill);
+  border-radius: var(--radius-card);
+  padding: 18px;
+  box-shadow: var(--shadow-float);
+  transition: opacity 0.22s ease, transform 0.22s ease;
+}
+
+.popover-card.hidden {
+  display: none;
+}
+
+.popover-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.popover-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--accent);
+  text-transform: uppercase;
+}
+
+.popover-header h3 {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ink-primary);
+  margin-top: 2px;
+}
+
+.icon-close-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--ink-secondary);
+  font-size: 12px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+
+.icon-close-btn:hover {
+  background: rgba(255, 255, 255, 0.16);
+  color: #ffffff;
+}
+
+/* Quick Chip Grid inside Popover */
+.chip-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 6px;
-  margin-top: 10px;
-  padding-top: 10px;
-  border-top: 1px solid rgba(255, 255, 255, 0.09);
+  margin-bottom: 14px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.09);
 }
 
-/* Right Control Panel */
-.hud-controls {
-  position: fixed;
-  top: 18px;
-  right: 18px;
-  z-index: 10;
-  width: 340px;
-  background: var(--bg-glass);
-  backdrop-filter: blur(16px);
-  border: 1px solid var(--border-glass);
-  border-radius: 14px;
-  padding: 16px;
-  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.52);
-  max-height: calc(100vh - 36px);
-  overflow-y: auto;
-}
-.section-title {
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--accent);
-  margin-bottom: 9px;
-}
-.preset-row {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 6px;
-  margin-bottom: 13px;
-}
-button.btn {
-  background: rgba(255, 255, 255, 0.06);
-  color: var(--text-main);
+button.btn.chip-btn {
+  padding: 6px 10px;
+  border-radius: var(--radius-pill);
   border: 1px solid rgba(255, 255, 255, 0.14);
-  border-radius: 8px;
-  padding: 7px 8px;
-  font-size: 11px;
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--ink-secondary);
+  font-size: 10.5px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.15s ease;
 }
-button.btn:hover,
-button.btn.active {
-  background: rgba(45, 212, 191, 0.22);
+
+button.btn.chip-btn:hover,
+button.btn.chip-btn.active {
+  background: rgba(45, 212, 191, 0.20);
   border-color: var(--accent);
-  color: #fff;
+  color: #ffffff;
 }
-button.btn.houdini-btn {
-  background: rgba(251, 146, 60, 0.18);
-  border-color: rgba(251, 146, 60, 0.5);
-  color: #fed7aa;
-}
-button.btn.houdini-btn:hover {
-  background: rgba(251, 146, 60, 0.34);
-  color: #fff;
-}
+
+/* Sliders inside Popover */
 .control-group {
-  margin-bottom: 10px;
+  margin-bottom: 9px;
 }
+
 .control-label {
   display: flex;
   justify-content: space-between;
-  font-size: 11.5px;
-  margin-bottom: 4px;
-  color: #e2e8f0;
+  align-items: center;
+  font-size: 11px;
+  font-weight: 500;
+  margin-bottom: 3px;
+  color: var(--ink-secondary);
 }
+
 .control-label span.val {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
   color: var(--accent);
   font-variant-numeric: tabular-nums;
-  font-weight: 600;
+  font-weight: 700;
 }
+
 input[type="range"] {
   width: 100%;
+  height: 5px;
   accent-color: var(--accent);
   cursor: pointer;
 }
-.perf-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
-  font-size: 11px;
-  padding: 8px 10px;
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-}
-/* Texture Swatch Inspector */
+
+/* Texture Swatch Inspector inside Popover */
 .tex-inspector {
   margin-top: 12px;
   padding-top: 12px;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-top: 1px solid rgba(255, 255, 255, 0.09);
 }
+
 .species-tabs {
   display: flex;
   gap: 4px;
   margin-bottom: 8px;
   flex-wrap: wrap;
 }
+
 .species-tab {
   font-size: 10px;
-  padding: 4px 7px;
-  border-radius: 6px;
-  background: rgba(255, 255, 255, 0.06);
+  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: var(--radius-pill);
+  background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.12);
-  color: var(--text-muted);
+  color: var(--ink-muted);
   cursor: pointer;
+  transition: all 0.14s ease;
 }
+
 .species-tab.active {
   background: rgba(56, 189, 248, 0.22);
   border-color: var(--accent-glow);
-  color: #fff;
+  color: #ffffff;
 }
+
 .swatch-grid {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
   gap: 5px;
 }
+
 .swatch {
   text-align: center;
   font-size: 9px;
-  color: var(--text-muted);
+  color: var(--ink-muted);
 }
+
 .swatch img {
   width: 100%;
   aspect-ratio: 1;
-  border-radius: 6px;
+  border-radius: 8px;
   border: 1px solid rgba(255, 255, 255, 0.18);
   display: block;
   margin-bottom: 3px;
   object-fit: cover;
 }
 
-/* Houdini Render Checkpoint Modal */
+/* ============================================================================
+   HOUDINI SOLARIS + KARMA BENCHMARK MODAL
+   ============================================================================ */
 #checkpoint-modal {
   position: fixed;
   inset: 0;
   z-index: 80;
-  background: rgba(2, 10, 20, 0.86);
-  backdrop-filter: blur(12px);
+  background: rgba(2, 10, 20, 0.84);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 24px;
 }
+
 #checkpoint-modal.hidden {
   display: none;
 }
+
 .modal-card {
-  background: rgba(8, 22, 38, 0.96);
-  border: 1px solid rgba(251, 146, 60, 0.45);
-  border-radius: 16px;
-  max-width: 1140px;
+  background: rgba(6, 18, 32, 0.96);
+  border: 1.5px solid rgba(251, 146, 60, 0.45);
+  border-radius: var(--radius-card);
+  max-width: 1120px;
   max-height: 92vh;
   overflow-y: auto;
   width: 100%;
-  padding: 18px 20px;
+  padding: 20px 22px;
   box-shadow: 0 24px 64px rgba(0, 0, 0, 0.75);
 }
+
 .modal-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 12px;
+  margin-bottom: 14px;
   gap: 12px;
 }
+
+.modal-header h2 {
+  font-size: 15px;
+  font-weight: 700;
+  margin-top: 5px;
+}
+
+.badge.houdini {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 3px 9px;
+  border-radius: var(--radius-pill);
+  background: rgba(251, 146, 60, 0.18);
+  color: var(--accent-houdini);
+  border: 1px solid rgba(251, 146, 60, 0.45);
+}
+
 .modal-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 12px;
-  align-items: stretch;
 }
+
 .modal-img-box {
   background: #020810;
   border: 1px solid rgba(255, 255, 255, 0.14);
-  border-radius: 10px;
+  border-radius: 14px;
   overflow: hidden;
   display: flex;
   flex-direction: column;
 }
+
 .modal-img-box img {
   width: 100%;
   aspect-ratio: 16 / 9;
   object-fit: cover;
   display: block;
 }
+
 .modal-caption {
-  padding: 8px 12px;
+  padding: 9px 12px;
   font-size: 11px;
-  color: #cbd5e1;
+  line-height: 1.45;
+  color: var(--ink-secondary);
   background: rgba(0, 0, 0, 0.45);
   border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-/* Loading Overlay */
+/* ============================================================================
+   LOADING OVERLAY & HIDE-UI / BENCHMARK STATES
+   ============================================================================ */
 #loading-overlay {
   position: fixed;
   inset: 0;
   background: radial-gradient(circle at center, #082038 0%, #020b14 100%);
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
   z-index: 100;
-  transition: opacity 0.5s ease;
+  transition: opacity 0.45s ease;
 }
+
 #loading-overlay.hidden {
   display: none;
   opacity: 0;
   pointer-events: none;
 }
+
+.loading-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 22px;
+  border-radius: var(--radius-pill);
+  background: rgba(6, 18, 32, 0.85);
+  border: 1.5px solid var(--line-accent);
+  box-shadow: var(--shadow-float);
+}
+
+.loading-title {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--accent);
+  margin-bottom: 3px;
+}
+
+#loading-text {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--ink-primary);
+}
+
 .spinner {
-  width: 44px;
-  height: 44px;
-  border: 3px solid rgba(45, 212, 191, 0.2);
+  width: 26px;
+  height: 26px;
+  border: 2.5px solid rgba(45, 212, 191, 0.22);
   border-top-color: var(--accent);
   border-radius: 50%;
-  animation: spin 0.9s linear infinite;
-  margin-bottom: 14px;
+  animation: spin 0.85s linear infinite;
+  flex-shrink: 0;
 }
+
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
-/* H toggles the HUD (art-director note: the panels cover ~35% of the frame) */
-body.hud-hidden .hud-header,
-body.hud-hidden .hud-controls {
+
+/* Show UI Restore Pill */
+.show-ui-pill {
+  bottom: 18px;
+  right: 18px;
+  padding: 8px 16px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--ink-primary);
+  cursor: pointer;
   opacity: 0;
   pointer-events: none;
-  transform: translateY(-6px);
+  transform: translateY(8px);
 }
-.hud-header,
-.hud-controls {
-  transition: opacity 0.35s ease, transform 0.35s ease;
+
+/* Hide UI state (H key or 👁️ HIDE button) */
+body.hud-hidden .top-left-pill,
+body.hud-hidden .top-right-pill,
+body.hud-hidden .popover-card,
+body.hud-hidden .hud-hint {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-8px);
 }
+
+body.hud-hidden .show-ui-pill {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+/* Headless benchmark ?hud=0 clean canvas capture */
+body.no-hud .floating-pill,
+body.no-hud .popover-card,
+body.no-hud .hud-hint {
+  display: none !important;
+}
+
 .hud-hint {
   position: fixed;
   left: 50%;
-  bottom: 14px;
+  bottom: 16px;
   transform: translateX(-50%);
-  font: 500 11px/1.4 system-ui, sans-serif;
+  padding: 5px 14px;
+  border-radius: var(--radius-pill);
+  background: rgba(6, 18, 32, 0.62);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  font: 600 10.5px/1.4 var(--font-sans);
   letter-spacing: 0.04em;
-  color: rgba(255, 255, 255, 0.55);
+  color: rgba(248, 250, 252, 0.72);
   pointer-events: none;
-  z-index: 5;
-  text-shadow: 0 1px 4px rgba(20, 10, 40, 0.6);
+  z-index: 10;
 }
-@media (max-width: 860px) {
-  .hud-header {
-    left: 10px;
-    right: 10px;
+
+@media (max-width: 980px) {
+  .top-left-pill {
     top: 10px;
+    left: 10px;
+    right: 10px;
+    overflow-x: auto;
     max-width: none;
-    padding: 10px 12px;
   }
-  .hud-sub,
-  .stats-grid {
-    display: none;
+  .top-right-pill {
+    top: auto;
+    bottom: 12px;
+    right: 10px;
   }
-  .hud-controls {
+  .popover-card {
+    top: auto;
+    bottom: 64px;
     right: 10px;
     left: 10px;
-    top: auto;
-    bottom: 10px;
     width: auto;
-    max-height: 38vh;
-    padding: 12px;
+    max-height: 52vh;
+  }
+  .modal-grid {
+    grid-template-columns: 1fr;
   }
   .hud-hint {
     display: none;
